@@ -1,7 +1,7 @@
 Backtest Repository
+Written by Junior Quant (junior.quant1@gmail.com), website: http://juniorquant.wordpress.com/
 
-Written by Junior Quant (junior.quant1@gmail.com)
+Matlab code to backtest a buy and hold strategy, I use it with a different signal which I won't provide here.
+Please feel free to code your own signal and use the libraries to backtest it.
 
-Contains Matlab code to backtest a strategy!
-
-Will develop further later...
+Contact me for any questions.

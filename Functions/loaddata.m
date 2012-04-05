@@ -1,7 +1,14 @@
-function [ data ] = loaddata( directory )
+function [ data ] = loaddata( directory, universe )
 
-    % List directory
-    files = dir([directory, strcat('*', '.txt')]);
+% universe: Stock in the universe
+
+    % Check if universe is populated
+    if isempty(universe)
+        files = dir(strcat(directory, '*.txt'));
+    else
+        files = universe;
+    end
+
     % Initialize struct
     futures = struct('name', {}, 'pointvalue', {}, 'data', {}, 'dClose', {}, 'wClose', {}, 'mClose', {});
     futures(length(files)).name = '';
@@ -11,13 +18,20 @@ function [ data ] = loaddata( directory )
     lastdates = zeros(length(files), 1);
     for k=1:length(files)
         [~, name, ~] = fileparts(files(k).name);
-        futures(k).name = name;
-        futures(k).data = createfts([directory, files(k).name], 'All');
+        filename = [directory, name, '.txt'];
         
-        % Find start date
-        datesbound = ftsbound(futures(k).data);
-        firstdates(k) = datesbound(1);
-        lastdates(k) = datesbound(2);
+        % Check if file exists
+        if exist(filename, 'file')
+            futures(k).name = name;
+            futures(k).data = createfts([directory, name, '.txt'], 'All');
+
+            % Find start date
+            datesbound = ftsbound(futures(k).data);
+            firstdates(k) = datesbound(1);
+            lastdates(k) = datesbound(2);
+        else
+            error('loaddata:symbol', strcat('The following symbol in the universe doesn''t have data: ', name));
+        end
     end
 
     % Resize data, and align it
@@ -34,7 +48,7 @@ function [ data ] = loaddata( directory )
         % Monthly data
         futures(k).mClose = tomonthly(futures(k).data.Close);
     end
-
+    
     data = futures;
 end
 

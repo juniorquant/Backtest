@@ -9,6 +9,7 @@ classdef summary
         pnl
         mdd
         sharperatio
+        dollarposition
     end
     
     methods
@@ -32,6 +33,9 @@ classdef summary
                     s.folio = fints(returns.dates(2:end), 1+cumsum(s.returnperperiod), fieldnames(fts, 1));
                     s.ec = fints(returns.dates(2:end), cumprod(1+sum(s.returnperperiod, 2)), 'EC');
             end
+            % Dollar position
+            dollarpos = abs(signals) .* fts2mat(fts) .* repmat(pointvalues, size(fts, 1), 1);
+            s.dollarposition = fints(fts.dates, sum(dollarpos, 2));
             % PnL & MaxDD
             s.pnl = fts2mat(s.ec(end));
             s.mdd = maxdd(fts2mat(s.ec));
@@ -60,7 +64,6 @@ classdef summary
             years = s.annual();
             years = cellstr(datestr(years.dates, 'yyyy'))';
             % Fill hData
-            k = 1;
             mData = s.monthly();
             hData = zeros(length(years), length(months));
             for i=1:length(mData)
@@ -81,10 +84,15 @@ classdef summary
             legend('boxoff');
             subplot(2,2,2);
             plot(s.ec);
+            title([' PnL: ' num2str(s.pnl) ', MaxDD: ' num2str(s.mdd)]);
             legend('Location', 'NorthWest');
             legend('boxoff');
             subplot(2,2,3);
             s.heatmap();
+            subplot(2,2,4);
+            plot(s.dollarposition);
+            legend('Location', 'NorthWest', 'Dollar Position');
+            legend('boxoff');
         end
         
         % Display
